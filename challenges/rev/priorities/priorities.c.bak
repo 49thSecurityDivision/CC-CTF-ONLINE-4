@@ -1,0 +1,144 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define INPUT 16
+
+// TODO: Add a debug_printf function (dprintf)
+unsigned int code = 0x1337;
+
+// cc_ctf{th15_15_g01ng_t0_b3_ann0y1ng_45_4nyth1ng_3l53_w3v3_d0n3}
+// copy the flag here so we can use vim macros to write this challenge
+void c0  (void) __attribute__((constructor (104)));
+void c1  (void) __attribute__((constructor (105)));
+void c2  (void) __attribute__((constructor (103)));
+void c3  (void) __attribute__((constructor (106)));
+void c4  (void) __attribute__((constructor (102)));
+void c5  (void) __attribute__((constructor (108)));
+void c6  (void) __attribute__((constructor (101)));
+void c7  (void) __attribute__((constructor (107)));
+
+void c0(void) {
+  for (int i = 0; i < 0xf; i++) {
+    if (0 == code) {
+      code == 0x1337;
+    }
+
+    code += 0x1337;
+    code = (unsigned int)(code / 2);
+  }
+  code++;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c1(void) {
+  for (int i = 0; i < 0xfffff; i++) {
+    code--;
+  }
+  code++;
+  code++;
+  code++;
+
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c2(void) {
+  for (int i = 0; i < 0xffff; i++) {
+    code--;
+  }
+  code++;
+  code--;
+  code++;
+  code--;
+  code--;
+  code--;
+  code++;
+  code--;
+  
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c3(void) {
+  code = (int)(code / 2);
+
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c4(void) {
+  code *= 4;
+
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c5(void) {
+  code *= 1;
+  code--;
+  code++;
+  code++;
+  code++;
+  code++;
+  code++;
+  code++;
+  code++;
+
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c6(void) {
+  srand(time(0));
+  code += rand();
+
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+void c7(void) { // TODO: Do *not* make this the last function. Use this to reset and "fix" the chal
+  code = code & 0x000000ff;
+  code >>= 0x8;
+
+  code += 0x1337;
+
+  printf("SHUFFLE:   %u\n", code);
+  return;
+}
+
+int main(void) {
+  srand(code);
+
+  unsigned int answer = rand();
+  printf("ANSWER IS: %u\n", answer);
+  unsigned int guess = 0;
+  char input[INPUT] = { 0 };
+
+  printf("What is the answer: ");
+  fgets(input, INPUT, stdin);
+
+  guess = atoi((const char*)input);
+
+  if (guess == answer) {
+    printf("Wow... you sure know your priorities\n");
+  } else {
+    printf("Nice try...\n");
+  }
+
+  return 0;
+}

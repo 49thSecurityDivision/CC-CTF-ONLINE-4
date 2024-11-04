@@ -1,0 +1,85 @@
+services:
+  anger_as_motivation:
+    build: ./challenges/pwn/anger_as_motivation
+    ports:
+      - "8002:8002"
+
+  fail_safe: 
+    build: ./challenges/pwn/fail_safe
+    ports:
+      - "8001:8001"
+
+  global_entry:
+    build: ./challenges/pwn/global_entry
+    ports:
+      - "8006:8006"
+
+  work_as_motivation:
+    build: ./challenges/pwn/work_as_motivation
+    ports:
+      - "8007:8007"
+
+  mathemagician:
+    build: ./challenges/scripting/mathemagician
+    ports:
+      - "8004:8004"
+
+  mathemetician:
+    build: ./challenges/scripting/mathemetician
+    ports:
+      - "8003:8003"
+
+  story_time:
+    build: ./challenges/scripting/story_time
+    ports:
+      - "8005:8005"
+
+  i_love_math:
+    build: ./challenges/web/i_love_math
+    ports:
+      - "8010:8080"
+
+  devwiki:
+    build: ./challenges/web/devwiki
+    ports:
+      - "8011:8080"
+    volumes:
+      - wiki-data:/app/sessions
+    environment:
+      - FLASK_SECRET_KEY=carolina_con_cool_chals
+
+  catalog:
+    build: ./challenges/web/catalog
+    ports:
+      - "8012:8080"
+
+  company_photos:
+    build: ./challenges/web/company_photos
+    ports:
+      - "8013:8080"
+    environment:
+      - FLASK_SECRET_KEY=carolina_con_cool_chals
+    volumes:
+      - photos-data:/app/sessions
+      - upload-data:/app/uploads
+
+  journeyman:
+    build: ./challenges/web/journeyman
+    ports:
+      - "8014:8080"
+
+  zippy:
+    build: ./challenges/mobile/zippy
+    ports:
+      - "8016:80"
+
+  priorities:
+    build: ./challenges/rev/priorities
+    ports:
+      - "8033:8033"
+
+volumes:
+  wiki-data:
+  photos-data:
+  upload-data:
+

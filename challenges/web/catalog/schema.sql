@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS secrets;
+DROP TABLE IF EXISTS books;
+
+CREATE TABLE books (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    author TEXT NOT NULL,
+    price REAL NOT NULL,
+    genre TEXT NOT NULL,
+    isbn TEXT UNIQUE
+);
+
+CREATE TABLE secrets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    value TEXT NOT NULL
+);

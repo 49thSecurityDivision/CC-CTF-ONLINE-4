@@ -1,0 +1,173 @@
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <sys/mman.h>
+#include <sys/ptrace.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+const unsigned char seed[] = "\xe3\xb8\xae\x75\xb7\x60\xe4\x40\xf6\xfa\x91\x11\xab\xe0\x88\xd7\x93";
+
+const unsigned char error_text[] = 
+"\x33\x8b\x2d\x93\x8e\xf9\x78\xc5"
+"\x87\xa8\xa0\xf6\x8d\xcc\x8e\x1d"
+"\xd8\x12\x96\x29\x94\x96\xe8\x31"
+"\xdc\x92\xe7\xb9\xf4\xcd\x96\x80"; // use 5 -> "Something went horribly wrong..."
+
+const unsigned char maps[] = "\x81\x05\xc5\x0f\x87\x6f\x85\x9f\xfd\x77\x84\x8d\xe9\xa7\xe0"; // use 2 -> /proc/self/maps
+const unsigned char mem[] =  "\xbe\x61\xd9\x8f\xeb\xf8\xe0\x86\xd4\xc8\x5a\xda\x05\x89"; // use 10 -> /proc/self/mem
+const unsigned char the_juice[] = {
+  0x49, 0xc7, 0xc2, 0x01, 0x00, 0x00, 0x00, 0x48, 0xbf, 0x0e, 0x21, 0x50,
+  0x0c, 0x69, 0xfa, 0x68, 0x75, 0x48, 0xbe, 0x49, 0x3d, 0x55, 0x14, 0x2e,
+  0xe1, 0x00, 0x1d, 0x48, 0x31, 0xd2, 0xe8, 0x8c, 0x00, 0x00, 0x00, 0x48,
+  0x89, 0xc7, 0x48, 0x89, 0xc3, 0x48, 0xc7, 0xc0, 0x02, 0x00, 0x00, 0x00,
+  0x48, 0xc7, 0xc6, 0x41, 0x00, 0x00, 0x00, 0x48, 0xc7, 0xc2, 0xff, 0x01,
+  0x00, 0x00, 0x0f, 0x05, 0x4d, 0x31, 0xd2, 0x49, 0x89, 0xc0, 0x48, 0x31,
+  0xc9, 0x51, 0x48, 0xbf, 0x39, 0x24, 0x5d, 0x4a, 0x2f, 0xbc, 0x15, 0x75,
+  0x48, 0xbe, 0x09, 0x3c, 0x67, 0x02, 0x6e, 0xe7, 0x06, 0x11, 0x48, 0xba,
+  0x05, 0x2a, 0x67, 0x07, 0x75, 0xf4, 0x13, 0x0c, 0xe8, 0x42, 0x00, 0x00,
+  0x00, 0x48, 0x89, 0xc6, 0x48, 0xc7, 0xc0, 0x01, 0x00, 0x00, 0x00, 0x4c,
+  0x89, 0xc7, 0x48, 0x8d, 0x34, 0x24, 0x48, 0xc7, 0xc2, 0x18, 0x00, 0x00,
+  0x00, 0x0f, 0x05, 0x48, 0xc7, 0xc0, 0x03, 0x00, 0x00, 0x00, 0x4c, 0x89,
+  0xc7, 0x0f, 0x05, 0x48, 0x89, 0xdf, 0x48, 0xc7, 0xc0, 0x57, 0x00, 0x00,
+  0x00, 0x0f, 0x05, 0x48, 0xc7, 0xc0, 0x3c, 0x00, 0x00, 0x00, 0x48, 0xc7,
+  0xc7, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x05, 0x49, 0xb9, 0x66, 0x49, 0x38,
+  0x64, 0x01, 0x92, 0x68, 0x75, 0x48, 0x83, 0xff, 0x00, 0x0f, 0x84, 0x20,
+  0x00, 0x00, 0x00, 0x4c, 0x31, 0xcf, 0x57, 0x48, 0x83, 0xfe, 0x00, 0x0f,
+  0x84, 0x12, 0x00, 0x00, 0x00, 0x4c, 0x31, 0xce, 0x56, 0x48, 0x83, 0xfa,
+  0x00, 0x0f, 0x84, 0x04, 0x00, 0x00, 0x00, 0x4c, 0x31, 0xca, 0x52, 0x48,
+  0x8d, 0x04, 0x24, 0x49, 0x83, 0xfa, 0x01, 0x0f, 0x84, 0x32, 0xff, 0xff,
+  0xff, 0xe9, 0x77, 0xff, 0xff, 0xff
+};
+const unsigned int the_juice_len = 246;
+
+char* decode(const unsigned char* text, int offset) {
+  int seed_len = strlen((char*)seed);
+  int text_len = strlen((char*)text);
+
+  char* result = calloc(text_len + 1, 1);
+
+  for (int i = 0; i < text_len; i++) {
+    result[i] = text[i] ^ seed[offset % seed_len];
+    offset++;
+  }
+  result[text_len] = '\0';
+
+  return result;
+}
+
+void error_and_fail() {
+    char* error = NULL;
+    error = decode(error_text, 5);
+    printf("%s\n", error);
+
+    if (NULL != error) {
+      free(error);
+      error = NULL;
+    }
+
+    exit(0x1337);
+}
+
+long syscall_wrapper2(long syscall_num, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5) {
+  long ret = syscall(syscall_num, *(int*)arg1, arg2, *(int*)arg3, arg4, arg5);
+
+  if (0 > ret) {
+    error_and_fail();
+  }
+
+  return ret;
+}
+
+long syscall_wrapper(long syscall_num, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5) {
+  long ret = syscall(syscall_num, arg1, *(int*)arg2, arg3, arg4, arg5);
+
+  if (0 > ret) {
+    error_and_fail();
+  }
+
+  return ret;
+}
+
+char* read_juice(int fd) {
+  size_t count = 1024; // We should never need more than this...
+  char* result = calloc(1024, 1);
+  
+  long ret = syscall_wrapper2((long)0, &fd, result, &count, NULL, NULL);
+  if (0 > ret) {
+    free(result);
+    result = NULL;
+  }
+
+  return result;
+}
+
+void anti_debug() {
+  if (ptrace(PTRACE_TRACEME, 0, 1, 0) == -1) {
+    exit(0);
+  }
+}
+
+void the_real_juice() {
+  anti_debug();
+
+  void (*shellcode)();
+  char* self_maps = decode(maps, 2);
+  int flags = O_RDONLY;
+  int fd = -1;
+
+  while (0 >= fd) {
+    fd = syscall_wrapper((long)2, self_maps, &flags, NULL, NULL, NULL);
+    sleep(0.1);
+  }
+
+  char* maps_read = NULL;
+  maps_read = read_juice(fd);
+  if (NULL == maps_read) {
+    error_and_fail();
+  }
+  
+  char curr_maps[12] = { 0 };
+  memcpy(curr_maps, maps_read, 12);
+  unsigned long long ro = 0;
+  ro = strtoll(curr_maps, NULL, 16);
+  ro += 0x20a0;
+
+  if (-1 != fd) {
+    close(fd);
+  }
+  if (NULL != maps_read) {
+    free(maps_read);
+  }
+
+  char* self_mem = decode(mem, 10);
+  fd = syscall_wrapper((long)2, self_mem, &flags, NULL, NULL, NULL);
+
+  if (0 > lseek(fd, ro, SEEK_SET)) {
+    error_and_fail();
+  }
+
+  char* mem_read = NULL;
+  mem_read = read_juice(fd);
+  if (NULL == mem_read) {
+    error_and_fail();
+  }
+
+  void* addr = (void*)0x500000;
+  shellcode = mmap(addr, 0x1000, PROT_WRITE | PROT_READ | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+  memcpy(shellcode, mem_read, the_juice_len);
+
+  shellcode();
+}
+
+void __attribute__((constructor)) pre_main() {
+  the_real_juice();
+}
+
+int main(void) {
+  return 0;
+}

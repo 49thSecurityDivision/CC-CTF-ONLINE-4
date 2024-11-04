@@ -1,0 +1,1 @@
+cc_ctf{code_zero}

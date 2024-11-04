@@ -1,0 +1,60 @@
+I have a very heavy fondness for writing challenges to stump interns. 
+
+I haven't had much luck so far, as our interns tend to be pretty sharp...
+
+That being said, we have come up with a new way to attack them this year! We are going
+to write a message (this message, in fact); and that message is going to be transposed
+pseduo-randomly! Well, not really...
+
+It will just be using a dead simple transposition cipher, but that ought to be enough to
+throw any intern off the scent. Imagine receiving the exact same message four times,
+but it looks a bit different every time! Literally, the only way they would be able to 
+solve this one would be to do something a tad deranged like doing character 
+frequency analysis. I do not believe for a solitary minute that they would think of that,
+so I am considering this method cryptographically secure and worthy of use by state,
+local, and federal governments going forward.
+
+I already sent a request for a patent! 
+
+That being said, I need to come up with a way to actually write the flag into this
+message, but I really want to use numbers in the flag as well. 
+
+I have another brilliant idea! I will write the flag out normally, but, wherever
+a number would occur, I will replace it with an all uppercase written out word 
+representing that number! For example, if I wanted to put a three (3) into the 
+flag, I would write it as THREE. If that was in the middle of the flag, and the
+flag was cc_ctf{word_word_thr33}, I would write it out as cc_ctf{word_word_thrTHREETHREE}!
+
+Alright! Let's begin!
+
+We need to get started, but I do not want to make it obvious where the flag is in
+the file, so I am going to surround it with some other text. If I include it here,
+we should be fine: cc_ctf{lZEROZEROks_lONEkTHREE_yZEROu_fONEgurTHREEd_ONEt_ZEROut}.
+We can not make it too obvious, as I am afraid these clever interns will solve this
+too easily...
+
+Now that we have identified what our flag should be and we have described the method
+by which we are writing it into the file, we really just need to write the code for
+transposing the letters. Ideally, we would want to choose a method that specifically
+targets vowels, since they are so frequent. For example, we would not want a
+transposition method that replaces all instances of the letter 'a' with 'e'. Rather,
+I would prefer 'a' to be replaced with a consonant. 
+
+Without too much education with respect to cryptography, I really do not have much
+more to offer when it comes to an explanation of why avoiding vowels would be ideal.
+Let us call it a feeling -- an intuition instead of a cold hard fact.
+
+As I write out this explanation, it is dawning on me that we probably should not
+have written out the numbers the way we did, as it will very likely impact the
+character frequency analysis. Well, I suppose that is just how the cookie crumbles!
+If our interns can not figure it out, then maybe they should go back to school (pun
+very much intended)!
+
+I wonder what type of test harness these students will come up with to perform their
+analysis...
+
+It may be useless to try and get this perfect. It is absolutely asinine to even
+hypothesize that even a single intern at our company could reverse my secret sauce.
+Sometimes, it takes nothing more than some simple thoughts to overwhelm complex
+odds. Anytime a solver attempts to uncover my machinations, we will just re-encrypt
+the crypto with my horrendous mathematically proven cipher.

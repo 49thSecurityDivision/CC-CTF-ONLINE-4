@@ -1,0 +1,9 @@
+1. Update mistaken_identity to actually require brute force 
+2. Update con-CAT-enate to have a cc_ctf flag 
+3. [DONE] Update russian-bot.net with the flag for meditation
+4. [DONE/KIND OF] Confirm global_entry isn't bypass-able like it was before. Solve must involve using the global thread
+5. [DONE] Update pesticide to be correct flag format
+6. Confirm plain_sight has correct flag format
+7. Modus Ponens needs better letter characterization
+8. RSA challenge is *completely* wrong. Release this last
+9. Make angr as motivation less guessable (require more ANGR)

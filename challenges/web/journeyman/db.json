@@ -1,0 +1,25 @@
+{
+    "documents": [
+        {
+            "id": "1",
+            "title": "Employee Handbook 2024",
+            "filename": "handbook.pdf",
+            "category": "HR",
+            "access_level": "Public"
+        },
+        {
+            "id": "2",
+            "title": "IT Security Guidelines",
+            "filename": "security_guidelines.pdf",
+            "category": "Policies",
+            "access_level": "Internal"
+        },
+        {
+            "id": "3",
+            "title": "New Employee Onboarding",
+            "filename": "onboarding_checklist.pdf",
+            "category": "HR",
+            "access_level": "Internal"
+        }
+    ]
+}

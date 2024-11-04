@@ -1,0 +1,1 @@
+cc_ctf{super_unsecure_image_upload}

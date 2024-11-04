@@ -1,0 +1,1 @@
+cc_ctf{journeying_through_dirs_like_a_champ}

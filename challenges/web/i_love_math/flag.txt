@@ -1,0 +1,1 @@
+cc_ctf{i_love_command_injection_2024}
